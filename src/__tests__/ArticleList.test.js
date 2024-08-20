@@ -24,11 +24,27 @@ const posts = [
 ];
 
 test("renders a <main> element", () => {
-  const { container } = render(<ArticleList posts={posts} />);
-  expect(container.querySelector("main")).toBeInTheDocument();
+  const { getByRole } = render(<ArticleList posts={posts} />);
+  expect(getByRole('main')).toBeInTheDocument();
 });
 
-test("renders a Article component for each post passed as a prop", () => {
-  const { container } = render(<ArticleList posts={posts} />);
-  expect(container.querySelector("main").children).toHaveLength(3);
+test("renders an Article component for each post passed as a prop", () => {
+  const { getAllByTestId } = render(<ArticleList posts={posts} />);
+  expect(getAllByTestId('article')).toHaveLength(posts.length);
+});
+
+test("renders the correct content in each Article component", () => {
+  const { getAllByTestId } = render(<ArticleList posts={posts} />);
+  const articles = getAllByTestId('article');
+
+  articles.forEach((article, index) => {
+    expect(article).toHaveTextContent(posts[index].title);
+    expect(article).toHaveTextContent(posts[index].date);
+    expect(article).toHaveTextContent(posts[index].preview);
+  });
+});
+
+test("handles an empty posts array", () => {
+  const { getByRole } = render(<ArticleList posts={[]} />);
+  expect(getByRole('main')).toBeEmptyDOMElement();
 });
